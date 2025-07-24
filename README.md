@@ -24,10 +24,9 @@ A modern document processing system that automates extraction, validation, and p
 ## Architecture
 
 ### Processing Flow
-1. **Upload**: User uploads document → Backend stores in MongoDB/GridFS → Message sent to RabbitMQ
+1. **Upload**: User uploads document → Backend stores in MongoDB → Message sent to RabbitMQ
 2. **Processing**: RabbitMQ consumer → OCR simulation → Metadata extraction → Validation
-3. **Real-time Updates**: Status changes broadcasted via WebSocket to connected clients
-
+   
 ### Data Model
 ```javascript
 {
@@ -112,12 +111,12 @@ npm run test:coverage    # Generate coverage report
 ```
 
 ## Docker Deployment
+```bash
+docker-compose up --build -d    # Build and run all services
+docker-compose logs -f          # View logs
+```
 
 Images:
 <img width="1711" height="1222" alt="image" src="https://github.com/user-attachments/assets/977b89c1-61b4-4d23-9145-cf923f0ae550" />
 <img width="1116" height="608" alt="image" src="https://github.com/user-attachments/assets/ff0c2335-e850-44dc-9e02-1d789384a10b" />
 
-```bash
-docker-compose up --build -d    # Build and run all services
-docker-compose logs -f          # View logs
-```
