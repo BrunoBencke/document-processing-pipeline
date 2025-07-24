@@ -33,7 +33,7 @@ A modern document processing system that automates extraction, validation, and p
 {
   "_id": "507f1f77bcf86cd799439011",
   "filename": "invoice_001.pdf",
-  "fileId": "507f1f77bcf86cd799439012", // GridFS reference
+  "fileId": "507f1f77bcf86cd799439012",
   "status": "VALIDATED", // UPLOADED, PROCESSING, VALIDATED, FAILED
   "metadata": {
     "invoiceNumber": "INV-2024-001",
@@ -112,6 +112,11 @@ npm run test:coverage    # Generate coverage report
 ```
 
 ## Docker Deployment
+
+Images:
+<img width="1711" height="1222" alt="image" src="https://github.com/user-attachments/assets/977b89c1-61b4-4d23-9145-cf923f0ae550" />
+<img width="1116" height="608" alt="image" src="https://github.com/user-attachments/assets/ff0c2335-e850-44dc-9e02-1d789384a10b" />
+
 ```bash
 docker-compose up --build -d    # Build and run all services
 docker-compose logs -f          # View logs
