@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: docprocessor-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8080
+      - REACT_APP_WS_URL=ws://localhost:8080/ws
+    depends_on:
+      - backend
+    networks:
+      - docprocessor-network
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: docprocessor-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATA_MONGODB_URI=mongodb://admin:admin123@mongodb:27017/docprocessor?authSource=admin
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=admin
+      - SPRING_RABBITMQ_PASSWORD=admin123
+      - SPRING_RABBITMQ_VIRTUAL_HOST=/docprocessor
+    depends_on:
+      mongodb:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - document_storage:/app/uploads
+    networks:
+      - docprocessor-network
+
+  mongodb:
+    image: mongo:7.0
+    container_name: docprocessor-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongodb-init:/docker-entrypoint-initdb.d
+    environment:
+      - MONGO_INITDB_DATABASE=docprocessor
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin123
+    networks:
+      - docprocessor-network
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: docprocessor-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin123
+      - RABBITMQ_DEFAULT_VHOST=/docprocessor
+    networks:
+      - docprocessor-network
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
+
+volumes:
+  mongodb_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
+  document_storage:
+    driver: local
+
+networks:
+  docprocessor-network:
+    driver: bridge
